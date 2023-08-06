@@ -170,6 +170,10 @@ function Menu:Alert(String, callback)
 end
 
 function Menu:Create(title, banner, description)
+	if game.CoreGui:FindFirstChild(title) then
+		game.CoreGui:FindFirstChild(title):Destroy()
+	end
+	
 	local UIMenu = Instance.new("ScreenGui")
 	local Banner = Instance.new("ImageLabel")
 	local Title = Instance.new("TextLabel")
@@ -194,7 +198,7 @@ function Menu:Create(title, banner, description)
 	
 	UIMenu.Name = title
 	UIMenu.IgnoreGuiInset = true
-	UIMenu.Parent = game.Players.LocalPlayer.PlayerGui
+	UIMenu.Parent = game.CoreGui
 	UIMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 	Alert.Name = "Alert"
