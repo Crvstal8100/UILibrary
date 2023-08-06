@@ -11,6 +11,7 @@ arg2: string: Banner
 arg3: string: Description
 ]]
 
+-- Send Alert
 Menu:Alert("Text", function(option)
     -- Continue = 1, Cancel = 2
     print(option)
@@ -22,6 +23,7 @@ arg1: string: Text
 arg2: callback: function
 ]]
 
+-- Send Notification
 Menu:Notify("Text", 5)
 
 --[[
@@ -30,6 +32,7 @@ arg1: string: Text
 arg2: number: Time
 ]]
 
+-- Create Tab
 local Tab = Menu:CreateTab("Title", "http://www.roblox.com/asset/?id=14299630623", "Description")
 
 --[[
@@ -39,8 +42,9 @@ arg2: string: Banner
 arg3: string: Description
 ]]
 
+-- Create Button
 tab:CreateButton("Button", function()
-	  print("Ok")
+	print("Ok")
 end)
 
 --[[
@@ -49,8 +53,9 @@ arg1: string: Text
 arg2: callback: function
 ]]
 
+-- Create Toggle
 tab:CreateToggle("Toggle", false, function(state)
-	  print(state)
+	print(state)
 end)
 
 --[[
@@ -60,8 +65,9 @@ arg2: bool: State
 arg3: callback: function
 ]]
 
+-- Create Slider
 tab:CreateSlider("Slider", 0, 10, function(value)
-	  print(value)
+	print(value)
 end)
 
 --[[
@@ -72,8 +78,9 @@ arg3: number: MaxValue
 arg4: callback: function
 ]]
 
+-- Create List
 tab:CreateList("List", {"1", "2", "3"}, function(value)
-	  print(value)
+	print(value)
 end)
 
 --[[
@@ -83,8 +90,9 @@ arg2: table: List
 arg3: callback: function
 ]]
 
+-- Create Keybind
 tab:CreateKeybind("Keybind", "K", function()
-	  print("Key Pressed")
+	print("Key Pressed")
 end)
 
 --[[
@@ -94,8 +102,9 @@ arg2: string: Keybind
 arg3: callback: function
 ]]
 
+-- Create Textbox
 tab:CreateTextbox("Textbox", ". . .", function(text)
-	  print(text)
+	print(text)
 end)
 
 --[[
