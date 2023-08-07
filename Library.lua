@@ -65,9 +65,8 @@ function notification(Notification)
 		Notification.TextLabel.Size += UDim2.new(0, 0, 0, Size * 14)
 		Notification.TextLabel.Text = Queue[1][1]
 
-		print(Queue[1][2])
 		
-		[[for i = Queue[1][2], 0, -1 do
+		for i = Queue[1][2], 0, -1 do
 			if i == 0 then
 				Notification.TextLabel.Text = ""
 				Notification.Size -= UDim2.new(0, 0, 0, Size * 26)
@@ -82,7 +81,7 @@ function notification(Notification)
 				end)
 			end
 			task.wait(1)
-		end]]
+		end
 	end
 end
 
