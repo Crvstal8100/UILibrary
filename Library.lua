@@ -395,7 +395,7 @@ function Menu:Create(title, banner, description)
 		if Queue[1] and not Cooldown then
 			Banner.Visible = false
 			notification(Notification)
-		elseif Queue2[1] and not Cooldown2 then#
+		elseif Queue2[1] and not Cooldown2 then
 			Banner.Visible = false
 			alert(Alert)
 		elseif not Queue[1] and not Queue[2] then
