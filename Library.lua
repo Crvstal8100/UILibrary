@@ -393,14 +393,9 @@ function Menu:Create(title, banner, description)
 	
 	game:GetService("RunService").Heartbeat:Connect(function()
 		if Queue[1] and not Cooldown then
-			Banner.Visible = false
 			notification(Notification)
 		elseif Queue2[1] and not Cooldown2 then
-			Banner.Visible = false
 			alert(Alert)
-		end
-		if not Queue[1] and not Cooldown and not Queue2[1] and not Cooldown2 then
-			Banner.Visible = true
 		end
 	end)
 	
