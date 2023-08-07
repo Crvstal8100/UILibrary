@@ -393,9 +393,13 @@ function Menu:Create(title, banner, description)
 	
 	game:GetService("RunService").Heartbeat:Connect(function()
 		if Queue[1] and not Cooldown then
+			Banner.Visible = false
 			notification(Notification)
-		elseif Queue2[1] and not Cooldown2 then
+		elseif Queue2[1] and not Cooldown2 then#
+			Banner.Visible = false
 			alert(Alert)
+		elseif not Queue[1] and not Queue[2] then
+			Banner.Visible = true
 		end
 	end)
 	
@@ -567,9 +571,6 @@ function Menu:Create(title, banner, description)
 		local Items = Instance.new("Folder")
 		local TabFrame = Instance.new("Frame")
 		local UIGridLayout = Instance.new("UIGridLayout")
-
-		Tabs.Name = "Tabs"
-		Tabs.Parent = Banner
 
 		Tab.Name = title_
 		Tab.Parent = Tabs
