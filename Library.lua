@@ -169,10 +169,21 @@ function Menu:Alert(String, callback)
 	end
 end
 
-function Menu:Create(title, banner, description)
+function Menu:Create(title, banner, description, options)
 	if game.CoreGui:FindFirstChild(title) then
 		game.CoreGui:FindFirstChild(title):Destroy()
 	end
+
+	local Options = {
+		["Keybinds"] = {
+			["Up"] = options["Keybinds"]["Up"] or Enum.KeyCode.KeypadEight,
+			["Down"] = options["Keybinds"]["Down"] or Enum.KeyCode.KeypadTwo,
+			["Left"] = options["Keybinds"]["Left"] or Enum.KeyCode.KeypadFour,
+			["Right"] = options["Keybinds"]["Right"] or Enum.KeyCode.KeypadSix,
+			["Enter"] = options["Keybinds"]["Enter"] or Enum.KeyCode.Return,
+			["Back"] = options["Keybinds"]["Back"] or Enum.KeyCode.KeypadZero
+		}
+	}
 	
 	local UIMenu = Instance.new("ScreenGui")
 	local Banner = Instance.new("ImageLabel")
@@ -411,7 +422,7 @@ function Menu:Create(title, banner, description)
 		end
 
 		if input.UserInputType == Enum.UserInputType.Keyboard then
-			if input.KeyCode == Enum.KeyCode.KeypadEight then
+			if input.KeyCode == Options["Keybinds"]["Up"]  then
 				if Selected ~= nil then
 					PlaySound(game.Players.LocalPlayer.Character)
 					if Selected > 1 and tabs[Selected] then
@@ -440,7 +451,7 @@ function Menu:Create(title, banner, description)
 						end
 					end
 				end
-			elseif input.KeyCode == Enum.KeyCode.KeypadTwo then
+			elseif input.KeyCode == Options["Keybinds"]["Down"] then
 				if Selected ~= nil then
 					PlaySound(game.Players.LocalPlayer.Character)
 					if Selected < #tabs and tabs[Selected] then
@@ -469,7 +480,7 @@ function Menu:Create(title, banner, description)
 						end
 					end
 				end
-			elseif input.KeyCode == Enum.KeyCode.Return then
+			elseif input.KeyCode == Options["Keybinds"]["Enter"] then
 				if Queue2[1] and Cooldown2 then
 					PlaySound(game.Players.LocalPlayer.Character)
 					
@@ -518,7 +529,7 @@ function Menu:Create(title, banner, description)
 						end
 					end
 				end
-			elseif input.KeyCode == Enum.KeyCode.KeypadZero then
+			elseif input.KeyCode == Options["Keybinds"]["Back"] then
 				PlaySound(game.Players.LocalPlayer.Character)
 				if Queue2[1] and Cooldown2 then
 					local Size = tonumber(math.floor((string.len(Queue2[1][1])) / 67))
@@ -717,7 +728,7 @@ function Menu:Create(title, banner, description)
 			end
 
 			if input.UserInputType == Enum.UserInputType.Keyboard then
-				if input.KeyCode == Enum.KeyCode.KeypadEight then
+				if input.KeyCode == Options["Keybinds"]["Up"] then
 					if selected ~= nil then
 						PlaySound(game.Players.LocalPlayer.Character)
 						if selected > 1 and items[selected] then
@@ -746,7 +757,7 @@ function Menu:Create(title, banner, description)
 							end
 						end
 					end
-				elseif input.KeyCode == Enum.KeyCode.KeypadTwo then
+				elseif input.KeyCode == Options["Keybinds"]["Down"] then
 					if selected ~= nil then
 						PlaySound(game.Players.LocalPlayer.Character)
 						if selected < #items and items[selected] then
@@ -775,7 +786,7 @@ function Menu:Create(title, banner, description)
 							end
 						end
 					end
-				elseif input.KeyCode == Enum.KeyCode.Return then
+				elseif input.KeyCode == Options["Keybinds"]["Enter"] then
 					if selected ~= nil then
 						PlaySound(game.Players.LocalPlayer.Character)
 						if items[selected] then
@@ -837,7 +848,7 @@ function Menu:Create(title, banner, description)
 							end
 						end
 					end
-				elseif input.KeyCode == Enum.KeyCode.KeypadFour then
+				elseif input.KeyCode == Options["Keybinds"]["Left"] then
 					if selected ~= nil then
 						if items[selected] then
 							if items[selected]["Toggle"] then
@@ -902,7 +913,7 @@ function Menu:Create(title, banner, description)
 							end
 						end
 					end
-				elseif input.KeyCode == Enum.KeyCode.KeypadSix then
+				elseif input.KeyCode == Options["Keybinds"]["Right"] then
 					if selected ~= nil then
 						if items[selected] then
 							if items[selected]["Toggle"] then
