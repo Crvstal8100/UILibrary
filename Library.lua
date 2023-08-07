@@ -174,14 +174,16 @@ function Menu:Create(title, banner, description, options)
 		game.CoreGui:FindFirstChild(title):Destroy()
 	end
 
+	print(options["Keybinds"])
+
 	local Options = {
 		["Keybinds"] = {
-			["Up"] = options["Keybinds"]["Up"] or Enum.KeyCode.KeypadEight,
-			["Down"] = options["Keybinds"]["Down"] or Enum.KeyCode.KeypadTwo,
-			["Left"] = options["Keybinds"]["Left"] or Enum.KeyCode.KeypadFour,
-			["Right"] = options["Keybinds"]["Right"] or Enum.KeyCode.KeypadSix,
-			["Enter"] = options["Keybinds"]["Enter"] or Enum.KeyCode.Return,
-			["Back"] = options["Keybinds"]["Back"] or Enum.KeyCode.KeypadZero
+			["Up"] = options["Keybinds"]["Up"],
+			["Down"] = options["Keybinds"]["Down"],
+			["Left"] = options["Keybinds"]["Left"],
+			["Right"] = options["Keybinds"]["Right"],
+			["Enter"] = options["Keybinds"]["Enter"],
+			["Back"] = options["Keybinds"]["Back"]
 		}
 	}
 	
