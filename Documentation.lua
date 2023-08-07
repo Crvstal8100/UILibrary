@@ -2,7 +2,18 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Crvstal8100/UILibrary/main/Library.lua"))()
 
 -- Create Menu
-local Menu = Library:Create("Title", "http://www.roblox.com/asset/?id=14299630623", "Description")
+local Options = {
+	["Keybinds"] = {
+		["Up"] = Enum.KeyCode.Up,
+		-- ["Down"],
+		-- ["Left"],
+		-- ["Right"],
+		-- ["Enter"],
+		-- ["Back"],
+	}
+}
+
+local Menu = Library:Create("Title", "http://www.roblox.com/asset/?id=14299630623", "Description", Options)
 
 --[[
 Create Menu
