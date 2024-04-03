@@ -963,8 +963,6 @@ function Menu:Create(title, banner, description)
 
 										if input.UserInputType == Enum.UserInputType.Keyboard then
 											if input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right then
-												keybindtoggle = false
-
 												for i,v in pairs(items[selected][1]) do
 													if v.Name == "Button" then
 														v.Text = items[selected]["Keybind"]
@@ -972,6 +970,8 @@ function Menu:Create(title, banner, description)
 												end
 
 												CheckKeyPress:Disconnect()
+												task.wait(1)
+												keybindtoggle = false
 												return
 											end
 
@@ -981,16 +981,18 @@ function Menu:Create(title, banner, description)
 												end
 											end
 											items[selected]["Keybind"] = input.KeyCode.Name
-											keybindtoggle = false
 											CheckKeyPress:Disconnect()
+											task.wait(1)
+											keybindtoggle = false
 										else
 											for i,v in pairs(items[selected][1]) do
 												if v.Name == "Button" then
 													v.Text = "Unknown"
 												end
 											end
-											keybindtoggle = false
 											CheckKeyPress:Disconnect()
+											task.wait(1)
+											keybindtoggle = false
 										end
 									end)
 								end
@@ -2075,20 +2077,23 @@ function Menu:Create(title, banner, description)
 
 						if input.UserInputType == Enum.UserInputType.Keyboard then
 							if input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right then
-								keybindtoggle = false
 								Button.Text = items[index]["Keybind"]
 								CheckKeyPress:Disconnect()
+								task.wait(1)
+								keybindtoggle = false
 								return
 							end
 
 							Button.Text = input.KeyCode.Name
 							items[index]["Keybind"] = input.KeyCode.Name
-							keybindtoggle = false
 							CheckKeyPress:Disconnect()
+							task.wait(1)
+							keybindtoggle = false
 						else
 							Button.Text = "Unknown"
-							keybindtoggle = false
 							CheckKeyPress:Disconnect()
+							task.wait(1)
+							keybindtoggle = false
 						end
 					end)
 				end
