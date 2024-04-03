@@ -1,5 +1,63 @@
 local Menu = {}
 
+Menu.Colors = {
+	["blue"] = {
+		["Name"] = "blue",
+		["Color"] = 'rgb(29, 165, 255)'
+	},
+	["red"] = {
+		["Name"] = "red",
+		["Color"] = 'rgb(204, 0, 0)'
+	},
+	["green"] = {
+		["Name"] = "green",
+		["Color"] = 'rgb(27, 199, 105)'
+	},
+	["yellow"] = {
+		["Name"] = "yellow",
+		["Color"] = 'rgb(255, 221, 28)'
+	},
+	["orange"] = {
+		["Name"] = "orange",
+		["Color"] = 'rgb(255, 140, 39)'
+	},
+	["gray"] = {
+		["Name"] = "gray",
+		["Color"] = 'rgb(126, 126, 126)'
+	},
+	["black"] = {
+		["Name"] = "black",
+		["Color"] = 'rgb(50, 50, 50)'
+	},
+	["white"] = {
+		["Name"] = "white",
+		["Color"] = 'rgb(255, 255, 255)'
+	}
+}
+
+Menu.Positions = {
+	["topleft"] = {
+		["Name"] = "topleft",
+		["Position"] = {
+			["xScale"] = 0.006,
+			["xOffset"] = 0,
+			["yScale"] = 0.014,
+			["yOffset"] = 0
+		},
+		["TextXAlignment"] = Enum.TextXAlignment.Left
+	},
+	["bottommiddle"] = {
+		["Name"] = "bottommiddle",
+		["Position"] = {
+			["xScale"] = 0.396,
+			["xOffset"] = 0,
+			["yScale"] = 0.81,
+			["yOffset"] = 0
+		},
+		["TextXAlignment"] = Enum.TextXAlignment.Center
+	},
+}
+
 local Selected = nil
 local selected = nil
 local selected_ = nil
@@ -20,11 +78,12 @@ end
 
 function PlaySound(parent)
 	local Sound = Instance.new("Sound")
-	Sound.Parent = parent
+	Sound.Name = "UILibrarySound"
+	Sound.Parent = parent or game.Players.LocalPlayer.Character
 	Sound.SoundId = "rbxassetid://226892749"
 	Sound.Volume = 0.25
 	Sound:Play()
-	
+
 	task.delay(Sound.TimeLength + 0.5, function()
 		Sound:Destroy()
 	end)
@@ -54,33 +113,81 @@ end
 function notification(Notification)
 	if Queue[1] and not Cooldown and Notification then
 		Cooldown = true
-		
-		PlaySound(game.Players.LocalPlayer.Character)
 
-		Tween(Notification, {BackgroundTransparency = 0.4})
+		if Queue[1][3] then
+			Notification.BackgroundTransparency = 0.4
+		end
 
-		local Size = tonumber(math.floor((string.len(Queue[1][1])) / 41))
+		local RemoveLength = 0
+		local Found = 0
+
+		for i,v in pairs(Menu.Colors) do
+			if Found > 0 then
+				if string.find(Notification.TextLabel.Text, '<colorstart:'..v["Name"]..'>') and string.find(Notification.TextLabel.Text, '<colorend:'..v["Name"]..'>') then
+					local NewString = ""
+					local Count = count(Notification.TextLabel.Text, '<colorstart:'..v["Name"]..'>')
+
+					local Length = (23 + (string.len(v["Name"]) * 2))
+
+					NewString = Notification.TextLabel.Text:gsub('<colorstart:'..v["Name"]..'>', '<mark><font color="'..v["Color"]..'">')
+					NewString = NewString:gsub('<colorend:'..v["Name"]..'>', '</font></mark>')
+
+					Notification.TextLabel.Text = NewString
+
+					RemoveLength += (Count * Length)
+					Found += (Count * 1)
+				end
+			elseif Found == 0 then
+				if string.find(Queue[1][1], '<colorstart:'..v["Name"]..'>') and string.find(Queue[1][1], '<colorend:'..v["Name"]..'>') then
+					local NewString = ""
+					local Count = count(Queue[1][1], '<colorstart:'..v["Name"]..'>')
+
+					local Length = (23 + (string.len(v["Name"]) * 2))
+
+					NewString = Queue[1][1]:gsub('<colorstart:'..v["Name"]..'>', '<mark><font color="'..v["Color"]..'">')
+					NewString = NewString:gsub('<colorend:'..v["Name"]..'>', '</font></mark>')
+
+					Notification.TextLabel.Text = NewString
+
+					RemoveLength += (Count * Length)
+					Found += (Count * 1)
+				end
+			end
+		end
+
+		local Size = tonumber(math.floor((string.len(Queue[1][1]) - RemoveLength) / 41))
 
 		Notification.Size += UDim2.new(0, 0, 0, Size * 26)
 		Notification.TextLabel.Size += UDim2.new(0, 0, 0, Size * 14)
-		Notification.TextLabel.Text = Queue[1][1]
+		if Found == 0 then
+			Notification.TextLabel.Text = Queue[1][1]
+		end
 
-		
+		for i,v in pairs(Menu.Positions) do
+			if Queue[1][4]:lower() == v["Name"] then
+				Notification.Position = UDim2.new(v["Position"]["xScale"], v["Position"]["xOffset"], v["Position"]["yScale"], v["Position"]["yOffset"])
+				Notification.TextLabel.TextXAlignment = v["TextXAlignment"]
+			end
+		end
+
 		for i = Queue[1][2], 0, -1 do
 			if i == 0 then
 				Notification.TextLabel.Text = ""
 				Notification.Size -= UDim2.new(0, 0, 0, Size * 26)
 				Notification.TextLabel.Size -= UDim2.new(0, 0, 0, Size * 14)
 
-				Tween(Notification, {BackgroundTransparency = 1})
+				if Queue[1][3] then
+					Tween(Notification, {BackgroundTransparency = 1})
+				end
 
 				task.delay(0.75, function()
 					table.remove(Queue, 1)
+					Notification.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 					Notification.Position = UDim2.new(0.006, 0, 0.014, 0)
 					Cooldown = false
 				end)
 			end
-			task.wait(1)
+			wait(1)
 		end
 	end
 end
@@ -88,7 +195,7 @@ end
 function alert(Alert)
 	if Queue2[1] and not Cooldown2 and Alert then
 		Cooldown2 = true
-		
+
 		if selected_ == nil then
 			selected_ = 1
 			Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
@@ -97,7 +204,7 @@ function alert(Alert)
 			Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
 		end
 
-		PlaySound(game.Players.LocalPlayer.Character)
+		PlaySound()
 
 		Alert.Visible = true
 
@@ -105,11 +212,11 @@ function alert(Alert)
 
 		Alert.Label.Size += UDim2.new(0, 0, 0, Size * 18)
 		Alert.Label.Text = Queue2[1][1]
-		
+
 		Alert.BarD.Position += UDim2.new(0, 0, Size * 0.018, 0)
 
 		Alert.Continue.MouseButton1Down:Connect(function()
-			PlaySound(game.Players.LocalPlayer.Character)
+			PlaySound()
 			if selected_ ~= 1 then
 				Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -131,9 +238,9 @@ function alert(Alert)
 				end)
 			end
 		end)
-		
+
 		Alert.Cancel.MouseButton1Down:Connect(function()
-			PlaySound(game.Players.LocalPlayer.Character)
+			PlaySound()
 			if selected_ ~= 2 then
 				Alert.Cancel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -145,7 +252,7 @@ function alert(Alert)
 				Alert.Label.Text = ""
 				Alert.Label.Size -= UDim2.new(0, 0, 0, Size * 18)
 				Alert.BarD.Position -= UDim2.new(0, 0, Size * 0.018, 0)
-				
+
 				Alert.Visible = false
 
 				task.delay(0.75, function()
@@ -158,39 +265,33 @@ function alert(Alert)
 	end
 end
 
-function Menu:Notify(String, Time)
+function Menu:Notify(String, Time, Background, Position)
 	if CheckSameString(Queue, String) ~= true then
-		table.insert(Queue, {String, Time})
+		table.insert(Queue, {String, Time, Background, Position})
 	end
 end
-
 function Menu:Alert(String, callback)
 	if CheckSameString(Queue2, String) ~= true then
 		table.insert(Queue2, {String, callback})
 	end
 end
 
-function Menu:Create(title, banner, description, options)
-	if game.CoreGui:FindFirstChild(title) then
-		game.CoreGui:FindFirstChild(title):Destroy()
+function Menu:Create(title, banner, description)
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild(title) then
+		game.Players.LocalPlayer.PlayerGui:FindFirstChild(title):Destroy()
 	end
 
-	local Options = {
-		["Keybinds"] = {
-			["Up"] = options["Keybinds"]["Up"],
-			["Down"] = options["Keybinds"]["Down"],
-			["Left"] = options["Keybinds"]["Left"],
-			["Right"] = options["Keybinds"]["Right"],
-			["Enter"] = options["Keybinds"]["Enter"],
-			["Back"] = options["Keybinds"]["Back"]
-		}
-	}
-	
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild(title.."_Notifications") then
+		game.Players.LocalPlayer.PlayerGui:FindFirstChild(title.."_Notifications"):Destroy()
+	end
+
 	local UIMenu = Instance.new("ScreenGui")
+	local NotificationMenu = Instance.new("ScreenGui")
 	local Banner = Instance.new("ImageLabel")
 	local Title = Instance.new("TextLabel")
 	local Description = Instance.new("Frame")
 	local Label = Instance.new("TextLabel")
+	local Left = Instance.new("ImageButton")
 	local Tabs = Instance.new("Folder")
 	local MenuTab = Instance.new("Folder")
 	local MenuItems = Instance.new("Folder")
@@ -207,14 +308,19 @@ function Menu:Create(title, banner, description, options)
 	local TextLabel_2 = Instance.new("TextLabel")
 	local Cancel = Instance.new("ImageButton")
 	local TextLabel_3 = Instance.new("TextLabel")
-	
+
 	UIMenu.Name = title
-	UIMenu.IgnoreGuiInset = true
-	UIMenu.Parent = game.CoreGui
+	UIMenu.IgnoreGuiInset = false
+	UIMenu.Parent = game.Players.LocalPlayer.PlayerGui
 	UIMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+	NotificationMenu.Name = title.."_Notifications"
+	NotificationMenu.IgnoreGuiInset = true
+	NotificationMenu.Parent = game.Players.LocalPlayer.PlayerGui
+	NotificationMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
 	Alert.Name = "Alert"
-	Alert.Parent = UIMenu
+	Alert.Parent = NotificationMenu
 	Alert.Visible = false
 	Alert.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	Alert.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -262,7 +368,7 @@ function Menu:Create(title, banner, description, options)
 	BarD.BorderSizePixel = 0
 	BarD.Position = UDim2.new(0.206382975, 0, 0.562, 0)
 	BarD.Size = UDim2.new(0, 550, 0, 2)
-	
+
 	Continue.Name = "Continue"
 	Continue.Parent = Alert
 	Continue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -293,7 +399,7 @@ function Menu:Create(title, banner, description, options)
 	Cancel.BorderSizePixel = 0
 	Cancel.Position = UDim2.new(0.967021286, 0, 0.935470819, 0)
 	Cancel.Size = UDim2.new(0, 25, 0, 25)
-	Cancel.Image = "http://www.roblox.com/asset/?id=14334918909"
+	Cancel.Image = "http://www.roblox.com/asset/?id=5612339837"
 	Cancel.ImageColor3 = Color3.fromRGB(120, 120, 120)
 
 	TextLabel_3.Parent = Cancel
@@ -307,9 +413,9 @@ function Menu:Create(title, banner, description, options)
 	TextLabel_3.Text = "Cancel"
 	TextLabel_3.TextColor3 = Color3.fromRGB(120, 120, 120)
 	TextLabel_3.TextSize = 14.000
-	
+
 	Notification.Name = "Notification"
-	Notification.Parent = UIMenu
+	Notification.Parent = NotificationMenu
 	Notification.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 	Notification.BackgroundTransparency = 1.000
 	Notification.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -344,6 +450,10 @@ function Menu:Create(title, banner, description, options)
 	Banner.Size = UDim2.new(0, 200, 0, 50)
 	Banner.Image = banner or "http://www.roblox.com/asset/?id=14299630623"
 
+	if string.lower(banner) == "default" or string.lower(banner) == "normal" then
+		Banner.Image = "http://www.roblox.com/asset/?id=14299630623"
+	end
+
 	Title.Name = "Title"
 	Title.Parent = Banner
 	Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -373,23 +483,35 @@ function Menu:Create(title, banner, description, options)
 	Label.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Label.BorderSizePixel = 0
 	Label.Position = UDim2.new(0.0299999993, 0, 0, 0)
-	Label.Size = UDim2.new(0, 194, 0, 25)
+	Label.Size = UDim2.new(0, 165, 0, 25)
 	Label.Font = Enum.Font.Roboto
-	Label.Text = description or ""
+	Label.Text = description
 	Label.TextColor3 = Color3.fromRGB(118, 196, 255)
 	Label.TextSize = 14.000
 	Label.TextWrapped = true
 	Label.TextXAlignment = Enum.TextXAlignment.Left
-	
+
+	Left.Name = "Left"
+	Left.Parent = Description
+	Left.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Left.BackgroundTransparency = 1.000
+	Left.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Left.BorderSizePixel = 0
+	Left.Position = UDim2.new(0.894999981, 0, 0.180000007, 0)
+	Left.Size = UDim2.new(0, 15, 0, 15)
+	Left.ZIndex = 2
+	Left.Image = "rbxassetid://2418687610"
+	Left.Visible = false
+
 	Tabs.Name = "Tabs"
 	Tabs.Parent = Banner
-	
+
 	MenuTab.Name = title
 	MenuTab.Parent = Tabs
-	
+
 	MenuItems.Name = "Items"
 	MenuItems.Parent = MenuTab
-	
+
 	MenuFrame.Parent = MenuItems
 	MenuFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	MenuFrame.BackgroundTransparency = 1.000
@@ -402,30 +524,34 @@ function Menu:Create(title, banner, description, options)
 	MenuGrid.SortOrder = Enum.SortOrder.LayoutOrder
 	MenuGrid.CellPadding = UDim2.new(0, 0, 0, 0)
 	MenuGrid.CellSize = UDim2.new(0, 200, 0, 25)
-	
+
 	game:GetService("RunService").Heartbeat:Connect(function()
 		if Queue[1] and not Cooldown then
-			Banner.Visible = false
 			notification(Notification)
 		elseif Queue2[1] and not Cooldown2 then
 			Banner.Visible = false
 			alert(Alert)
-		elseif not Queue[1] and not Queue[2] then
+		end
+		if not Queue2[1] and not Cooldown2 then
 			Banner.Visible = true
 		end
 	end)
-	
+
 	local tabs = {}
-	
+
 	UIS.InputBegan:Connect(function(input, gpe)
 		if gpe then
 			return
 		end
 
+		if not UIMenu.Enabled and not Queue2[1] then
+			return	
+		end	
+
 		if input.UserInputType == Enum.UserInputType.Keyboard then
-			if input.KeyCode == Options["Keybinds"]["Up"]  then
+			if input.KeyCode == Enum.KeyCode.Up then
 				if Selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if Selected > 1 and tabs[Selected] then
 						for _,instance in pairs(tabs[Selected][1]) do
 							if tabs[Selected][2][instance.Name] then
@@ -452,9 +578,9 @@ function Menu:Create(title, banner, description, options)
 						end
 					end
 				end
-			elseif input.KeyCode == Options["Keybinds"]["Down"] then
+			elseif input.KeyCode == Enum.KeyCode.Down then
 				if Selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if Selected < #tabs and tabs[Selected] then
 						for _,instance in pairs(tabs[Selected][1]) do
 							if tabs[Selected][2][instance.Name] then
@@ -481,12 +607,12 @@ function Menu:Create(title, banner, description, options)
 						end
 					end
 				end
-			elseif input.KeyCode == Options["Keybinds"]["Enter"] then
+			elseif input.KeyCode == Enum.KeyCode.Return then
 				if Queue2[1] and Cooldown2 then
-					PlaySound(game.Players.LocalPlayer.Character)
-					
+					PlaySound()
+
 					local Size = tonumber(math.floor((string.len(Queue2[1][1])) / 67))
-					
+
 					if selected_ ~= 1 then
 						Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
 						Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -497,15 +623,15 @@ function Menu:Create(title, banner, description, options)
 						pcall(Queue2[1][2], selected_)
 						Alert.Label.Text = ""
 						Alert.Label.Size -= UDim2.new(0, 0, 0, Size * 18)
-						
+
 						Alert.BarD.Position -= UDim2.new(0, 0, Size * 0.018, 0)
-						
+
 						Alert.Cancel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 						Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 						Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
 						Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-						
+
 						Alert.Visible = false
 
 						task.delay(0.75, function()
@@ -516,12 +642,13 @@ function Menu:Create(title, banner, description, options)
 					end
 				else
 					if Selected ~= nil then
-						PlaySound(game.Players.LocalPlayer.Character)
+						PlaySound()
 						if tabs[Selected] then
 							if tabs[Selected]["Menu"] then
 								for _,Tab in pairs(Tabs:GetChildren()) do
 									if Tab.Name == tabs[Selected]["Title"] then
 										Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = true
+										Left.Visible = true
 									else
 										Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = false
 									end
@@ -530,9 +657,10 @@ function Menu:Create(title, banner, description, options)
 						end
 					end
 				end
-			elseif input.KeyCode == Options["Keybinds"]["Back"] then
-				PlaySound(game.Players.LocalPlayer.Character)
+			elseif input.KeyCode == Enum.KeyCode.Backspace then
 				if Queue2[1] and Cooldown2 then
+					PlaySound()
+
 					local Size = tonumber(math.floor((string.len(Queue2[1][1])) / 67))
 
 					if selected_ ~= 2 then
@@ -545,10 +673,10 @@ function Menu:Create(title, banner, description, options)
 						pcall(Queue2[1][2], selected_)
 						Alert.Label.Text = ""
 						Alert.Label.Size -= UDim2.new(0, 0, 0, Size * 18)
-						
+
 						Alert.Cancel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 						Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-						
+
 						Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
 						Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 
@@ -566,6 +694,7 @@ function Menu:Create(title, banner, description, options)
 					for _,Tab in pairs(Tabs:GetChildren()) do
 						if Tab.Name == title then
 							Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = true
+							Left.Visible = false
 						else
 							Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = false
 						end
@@ -574,7 +703,7 @@ function Menu:Create(title, banner, description, options)
 			end
 		end
 	end)
-	
+
 	function tabs:CreateTab(title_, banner_, description_)
 		local MenuItem = Instance.new("TextButton")
 		local Label_7 = Instance.new("TextLabel")
@@ -583,6 +712,9 @@ function Menu:Create(title, banner, description, options)
 		local Items = Instance.new("Folder")
 		local TabFrame = Instance.new("Frame")
 		local UIGridLayout = Instance.new("UIGridLayout")
+
+		Tabs.Name = "Tabs"
+		Tabs.Parent = Banner
 
 		Tab.Name = title_
 		Tab.Parent = Tabs
@@ -643,7 +775,7 @@ function Menu:Create(title, banner, description, options)
 		Right_3.Position = UDim2.new(0.894999981, 0, 0.200000003, 0)
 		Right_3.Size = UDim2.new(0, 15, 0, 15)
 		Right_3.Image = "rbxassetid://2418686949"
-		
+
 		local items = {}
 
 		table.insert(tabs, {
@@ -684,7 +816,7 @@ function Menu:Create(title, banner, description, options)
 			["Description"] = description_
 		})
 		local index = #tabs
-		
+
 		if Selected == nil and tabs[2] == nil then
 			Selected = 1
 			for _,instance in pairs(tabs[Selected][1]) do
@@ -693,7 +825,7 @@ function Menu:Create(title, banner, description, options)
 				end
 			end
 		end
-		
+
 		MenuItem.MouseButton1Down:Connect(function()
 			if Selected ~= nil then
 				PlaySound(game.Players.LocalPlayer.Character)
@@ -714,6 +846,7 @@ function Menu:Create(title, banner, description, options)
 						if Tab.Name == tabs[index]["Title"] then
 							Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = true
 							Label.Text = tabs[index]["Description"]
+							Left.Visible = true
 							Title.Text = tabs[index]["Title"]
 						else
 							Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = false
@@ -722,16 +855,33 @@ function Menu:Create(title, banner, description, options)
 				end
 			end
 		end)
-		
+
+		Left.MouseButton1Down:Connect(function()
+			if Selected == index then
+				for _,Tab in pairs(Tabs:GetChildren()) do
+					if Tab.Name == title then
+						Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = true
+						Left.Visible = false
+						PlaySound(game.Players.LocalPlayer.Character)
+					else
+						Tab:FindFirstChild("Items"):FindFirstChild("Frame").Visible = false
+					end
+				end
+			end
+		end)
+
 		UIS.InputBegan:Connect(function(input, gpe)
 			if gpe then
 				return
 			end
 
+			if not UIMenu.Enabled and not Queue2[1] then
+				return	
+			end	
+
 			if input.UserInputType == Enum.UserInputType.Keyboard then
-				if input.KeyCode == Options["Keybinds"]["Up"] then
+				if input.KeyCode == Enum.KeyCode.Up then
 					if selected ~= nil then
-						PlaySound(game.Players.LocalPlayer.Character)
 						if selected > 1 and items[selected] then
 							for _,instance in pairs(items[selected][1]) do
 								if items[selected][2][instance.Name] then
@@ -758,9 +908,8 @@ function Menu:Create(title, banner, description, options)
 							end
 						end
 					end
-				elseif input.KeyCode == Options["Keybinds"]["Down"] then
+				elseif input.KeyCode == Enum.KeyCode.Down then
 					if selected ~= nil then
-						PlaySound(game.Players.LocalPlayer.Character)
 						if selected < #items and items[selected] then
 							for _,instance in pairs(items[selected][1]) do
 								if items[selected][2][instance.Name] then
@@ -787,9 +936,8 @@ function Menu:Create(title, banner, description, options)
 							end
 						end
 					end
-				elseif input.KeyCode == Options["Keybinds"]["Enter"] then
+				elseif input.KeyCode == Enum.KeyCode.Return then
 					if selected ~= nil then
-						PlaySound(game.Players.LocalPlayer.Character)
 						if items[selected] then
 							if items[selected]["Button"] then
 								pcall(items[selected]["Callback"])
@@ -814,7 +962,7 @@ function Menu:Create(title, banner, description, options)
 										if gpe then return end
 
 										if input.UserInputType == Enum.UserInputType.Keyboard then
-											if input.KeyCode == Enum.KeyCode.KeypadEight or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.KeypadTwo or input.KeyCode == Enum.KeyCode.KeypadFour or input.KeyCode == Enum.KeyCode.KeypadSix then
+											if input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right then
 												keybindtoggle = false
 
 												for i,v in pairs(items[selected][1]) do
@@ -849,140 +997,158 @@ function Menu:Create(title, banner, description, options)
 							end
 						end
 					end
-				elseif input.KeyCode == Options["Keybinds"]["Left"] then
-					if selected ~= nil then
-						if items[selected] then
-							if items[selected]["Toggle"] then
-								PlaySound(game.Players.LocalPlayer.Character)
-								items[selected]["State"] = not items[selected]["State"]
+				end
+			end
+		end)
 
-								if items[selected]["State"] then
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Checkbox" then
-											v.Image = "rbxassetid://4822126140"
-										end
-									end
-								else
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Checkbox" then
-											v.Image = "rbxassetid://5228818459"
-										end
-									end
+		game:GetService("ContextActionService"):BindActionAtPriority("UILeft", function(_, inputState, _)
+			if inputState ~= Enum.UserInputState.Begin then
+				return Enum.ContextActionResult.Pass
+			end
+
+			if selected ~= nil then
+				if items[selected] then
+					if items[selected]["Toggle"] then
+						PlaySound()
+						items[selected]["State"] = not items[selected]["State"]
+
+						if items[selected]["State"] then
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Checkbox" then
+									v.Image = "rbxassetid://4822126140"
 								end
-
-								for i,v in pairs(items[selected][1]) do
-									if v.Name == "Checkmark" then
-										v.Visible = items[selected]["State"]
-										v.ImageColor3 = Color3.fromRGB(255, 255, 255)
-									end
-								end
-							elseif items[selected]["ListItem"] then
-								PlaySound(game.Players.LocalPlayer.Character)
-								if items[selected]["selectedItem"] > 1 then
-									items[selected]["selectedItem"] -= 1
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "List" then
-											v.Text = items[selected]["List"][items[selected]["selectedItem"]]
-										end
-									end
-								else
-									items[selected]["selectedItem"] = #items[selected]["List"]
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "List" then
-											v.Text = items[selected]["List"][items[selected]["selectedItem"]]
-										end
-									end
-								end
-							elseif items[selected]["Slider"] then
-								if items[selected]["Value"] ~= items[selected]["MinValue"] then
-									items[selected]["Value"] -= 1
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "SliderValue" then
-											v.Text = items[selected]["Value"]
-										end
-									end
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Outer" then
-											v.Size = UDim2.new(0, (items[selected]["Value"] / items[selected]["MaxValue"] * 85), 0, 5)
-										end
-									end
+							end
+						else
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Checkbox" then
+									v.Image = "rbxassetid://5228818459"
 								end
 							end
 						end
-					end
-				elseif input.KeyCode == Options["Keybinds"]["Right"] then
-					if selected ~= nil then
-						if items[selected] then
-							if items[selected]["Toggle"] then
-								PlaySound(game.Players.LocalPlayer.Character)
-								items[selected]["State"] = not items[selected]["State"]
 
-								if items[selected]["State"] then
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Checkbox" then
-											v.Image = "rbxassetid://4822126140"
-										end
-									end
-								else
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Checkbox" then
-											v.Image = "rbxassetid://5228818459"
-										end
-									end
+						for i,v in pairs(items[selected][1]) do
+							if v.Name == "Checkmark" then
+								v.Visible = items[selected]["State"]
+								v.ImageColor3 = Color3.fromRGB(255, 255, 255)
+							end
+						end
+					elseif items[selected]["ListItem"] then
+						PlaySound()
+						if items[selected]["selectedItem"] > 1 then
+							items[selected]["selectedItem"] -= 1
+
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "List" then
+									v.Text = items[selected]["List"][items[selected]["selectedItem"]]
 								end
+							end
+						else
+							items[selected]["selectedItem"] = #items[selected]["List"]
 
-								for i,v in pairs(items[selected][1]) do
-									if v.Name == "Checkmark" then
-										v.Visible = items[selected]["State"]
-										v.ImageColor3 = Color3.fromRGB(255, 255, 255)
-									end
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "List" then
+									v.Text = items[selected]["List"][items[selected]["selectedItem"]]
 								end
-							elseif items[selected]["ListItem"] then
-								PlaySound(game.Players.LocalPlayer.Character)
-								if items[selected]["selectedItem"] ~= #items[selected]["List"] then
-									items[selected]["selectedItem"] += 1
+							end
+						end
+					elseif items[selected]["Slider"] then
+						PlaySound()
+						if items[selected]["Value"] ~= items[selected]["MinValue"] then
+							items[selected]["Value"] -= 1
 
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "List" then
-											v.Text = items[selected]["List"][items[selected]["selectedItem"]]
-										end
-									end
-								else
-									items[selected]["selectedItem"] = 1
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "List" then
-											v.Text = items[selected]["List"][items[selected]["selectedItem"]]
-										end
-									end
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "SliderValue" then
+									v.Text = items[selected]["Value"]
 								end
-							elseif items[selected]["Slider"] then
-								if items[selected]["Value"] ~= items[selected]["MaxValue"] then
-									items[selected]["Value"] += 1
+							end
 
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "SliderValue" then
-											v.Text = items[selected]["Value"]
-										end
-									end
-
-									for i,v in pairs(items[selected][1]) do
-										if v.Name == "Outer" then
-											v.Size = UDim2.new(0, (items[selected]["Value"] / items[selected]["MaxValue"] * 85), 0, 5)
-										end
-									end
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Outer" then
+									v.Size = UDim2.new(0, (items[selected]["Value"] / items[selected]["MaxValue"] * 85), 0, 5)
 								end
 							end
 						end
 					end
 				end
 			end
-		end)
-		
+
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Left)
+
+		game:GetService("ContextActionService"):BindActionAtPriority("UIRight", function(_, inputState, _)
+			if inputState ~= Enum.UserInputState.Begin then
+				return Enum.ContextActionResult.Pass
+			end
+
+			if selected ~= nil then
+				if items[selected] then
+					if items[selected]["Toggle"] then
+						PlaySound()
+						items[selected]["State"] = not items[selected]["State"]
+
+						if items[selected]["State"] then
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Checkbox" then
+									v.Image = "rbxassetid://4822126140"
+								end
+							end
+						else
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Checkbox" then
+									v.Image = "rbxassetid://5228818459"
+								end
+							end
+						end
+
+						for i,v in pairs(items[selected][1]) do
+							if v.Name == "Checkmark" then
+								v.Visible = items[selected]["State"]
+								v.ImageColor3 = Color3.fromRGB(255, 255, 255)
+							end
+						end
+					elseif items[selected]["ListItem"] then
+						PlaySound()
+						if items[selected]["selectedItem"] ~= #items[selected]["List"] then
+							items[selected]["selectedItem"] += 1
+
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "List" then
+									v.Text = items[selected]["List"][items[selected]["selectedItem"]]
+								end
+							end
+						else
+							items[selected]["selectedItem"] = 1
+
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "List" then
+									v.Text = items[selected]["List"][items[selected]["selectedItem"]]
+								end
+							end
+						end
+					elseif items[selected]["Slider"] then
+						PlaySound()
+						if items[selected]["Value"] ~= items[selected]["MaxValue"] then
+							items[selected]["Value"] += 1
+
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "SliderValue" then
+									v.Text = items[selected]["Value"]
+								end
+							end
+
+							for i,v in pairs(items[selected][1]) do
+								if v.Name == "Outer" then
+									v.Size = UDim2.new(0, (items[selected]["Value"] / items[selected]["MaxValue"] * 85), 0, 5)
+								end
+							end
+						end
+					end
+				end
+			end
+
+			return Enum.ContextActionResult.Sink
+		end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Right)
+
 		function items:CreateButton(name, callback)
 			local ButtonItem = Instance.new("TextButton")
 			local Label_6 = Instance.new("TextLabel")
@@ -1057,7 +1223,7 @@ function Menu:Create(title, banner, description, options)
 
 			ButtonItem.MouseButton1Down:Connect(function()
 				if selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if selected ~= index then
 						for _,instance in pairs(items[selected][1]) do
 							if items[selected][2][instance.Name] then
@@ -1108,7 +1274,7 @@ function Menu:Create(title, banner, description, options)
 			Label_2.Position = UDim2.new(0.0299999993, 0, 0, 0)
 			Label_2.Size = UDim2.new(0, 167, 0, 25)
 			Label_2.Font = Enum.Font.Roboto
-			Label_2.Text = "Add ketchup?"
+			Label_2.Text = name
 			Label_2.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Label_2.TextSize = 14.000
 			Label_2.TextWrapped = true
@@ -1211,7 +1377,7 @@ function Menu:Create(title, banner, description, options)
 
 			Toggle.MouseButton1Down:Connect(function()
 				if selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if selected ~= index then
 						for _,instance in pairs(items[selected][1]) do
 							if items[selected][2][instance.Name] then
@@ -1233,11 +1399,11 @@ function Menu:Create(title, banner, description, options)
 			Button.MouseButton1Down:Connect(function()
 				if selected ~= nil then
 					if selected == index then
-						PlaySound(game.Players.LocalPlayer.Character)
-						if items[index]["State"] then
+						PlaySound()
+						if items[index]["State"] == true then
 							items[index]["State"] = false
 							Checkbox.Image = "rbxassetid://5228818459"
-						else
+						elseif items[index]["State"] == false then
 							items[index]["State"] = true
 							Checkbox.Image = "rbxassetid://4822126140"
 						end
@@ -1377,7 +1543,7 @@ function Menu:Create(title, banner, description, options)
 
 			ListItem.MouseButton1Down:Connect(function()
 				if selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if selected ~= index then
 						for _,instance in pairs(items[selected][1]) do
 							if items[selected][2][instance.Name] then
@@ -1399,7 +1565,7 @@ function Menu:Create(title, banner, description, options)
 			Left.MouseButton1Down:Connect(function()
 				if selected ~= nil then
 					if selected == index then
-						PlaySound(game.Players.LocalPlayer.Character)
+						PlaySound()
 						if items[index]["selectedItem"] > 1 then
 							items[index]["selectedItem"] -= 1
 							List.Text = items[index]["List"][items[index]["selectedItem"]]
@@ -1414,7 +1580,7 @@ function Menu:Create(title, banner, description, options)
 			Right.MouseButton1Down:Connect(function()
 				if selected ~= nil then
 					if selected == index then
-						PlaySound(game.Players.LocalPlayer.Character)
+						PlaySound()
 						if items[index]["selectedItem"] ~= #items[index]["List"] then
 							items[index]["selectedItem"] += 1
 							List.Text = items[index]["List"][items[index]["selectedItem"]]
@@ -1463,7 +1629,7 @@ function Menu:Create(title, banner, description, options)
 			SliderValue.ZIndex = 2
 			SliderValue.Font = Enum.Font.SourceSans
 			SliderValue.PlaceholderColor3 = Color3.fromRGB(0, 174, 255)
-			SliderValue.PlaceholderText = "0"
+			SliderValue.PlaceholderText = minvalue
 			SliderValue.Text = ""
 			SliderValue.TextColor3 = Color3.fromRGB(0, 174, 255)
 			SliderValue.TextScaled = true
@@ -1590,12 +1756,29 @@ function Menu:Create(title, banner, description, options)
 				end
 			end)
 
-			SliderValue.Changed:Connect(function()
-				PlaySound(game.Players.LocalPlayer.Character)
+			SliderValue.Focused:Connect(function()
 				if selected ~= index then
 					SliderValue.Text = items[index]["Value"]
+					PlaySound(game.Players.LocalPlayer.Character)
+					if selected ~= index then
+						for _,instance in pairs(items[selected][1]) do
+							if items[selected][2][instance.Name] then
+								Tween(instance, items[selected][2][instance.Name]["Original"])
+							end
+						end
+						selected = index
+						for _,instance in pairs(items[selected][1]) do
+							if items[selected][2][instance.Name] then
+								Tween(instance, items[selected][2][instance.Name]["TweenGoal"])
+							end
+						end
+					end
 					return
 				end
+			end)
+
+			SliderValue.FocusLost:Connect(function()
+				PlaySound(game.Players.LocalPlayer.Character)
 
 				if tonumber(SliderValue.Text) then
 					if tonumber(SliderValue.Text) > items[index]["MaxValue"] then
@@ -1740,7 +1923,7 @@ function Menu:Create(title, banner, description, options)
 
 			TextBoxItem.MouseButton1Down:Connect(function()
 				if selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if selected ~= index then
 						for _,instance in pairs(items[selected][1]) do
 							if items[selected][2][instance.Name] then
@@ -1762,7 +1945,7 @@ function Menu:Create(title, banner, description, options)
 			TextBox.FocusLost:Connect(function()
 				if selected ~= nil then
 					if selected == index then
-						PlaySound(game.Players.LocalPlayer.Character)
+						PlaySound()
 						items[index]["Text"] = TextBox.Text
 					else
 						TextBox.Text = items[index]["Text"]
@@ -1865,7 +2048,7 @@ function Menu:Create(title, banner, description, options)
 
 			KeybindItem.MouseButton1Down:Connect(function()
 				if selected ~= nil then
-					PlaySound(game.Players.LocalPlayer.Character)
+					PlaySound()
 					if selected ~= index then
 						for _,instance in pairs(items[selected][1]) do
 							if items[selected][2][instance.Name] then
@@ -1891,7 +2074,7 @@ function Menu:Create(title, banner, description, options)
 						if gpe then return end
 
 						if input.UserInputType == Enum.UserInputType.Keyboard then
-							if input.KeyCode == Enum.KeyCode.KeypadEight or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.KeypadTwo or input.KeyCode == Enum.KeyCode.KeypadFour or input.KeyCode == Enum.KeyCode.KeypadSix then
+							if input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.Right then
 								keybindtoggle = false
 								Button.Text = items[index]["Keybind"]
 								CheckKeyPress:Disconnect()
@@ -1926,7 +2109,7 @@ function Menu:Create(title, banner, description, options)
 
 		return items
 	end
-	
+
 	return tabs
 end
 
