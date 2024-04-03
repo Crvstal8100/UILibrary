@@ -2,18 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Crvstal8100/UILibrary/main/Library.lua"))()
 
 -- Create Menu
-local Options = {
-	["Keybinds"] = {
-		["Up"] = Enum.KeyCode.Up,
-		-- ["Down"],
-		-- ["Left"],
-		-- ["Right"],
-		-- ["Enter"],
-		-- ["Back"],
-	}
-}
-
-local Menu = Library:Create("Title", "http://www.roblox.com/asset/?id=14299630623", "Description", Options)
+local Menu = Library:Create("Title", "http://www.roblox.com/asset/?id=14299630623", "Description")
 
 --[[
 Create Menu
@@ -32,6 +21,9 @@ end)
 Send Alert
 arg1: string: Text
 arg2: callback: function
+^
+|
+Continue = 1, Cancel = 2
 ]]
 
 -- Send Notification
@@ -41,6 +33,11 @@ Menu:Notify("Text", 5)
 Send Notification
 arg1: string: Text
 arg2: number: Time
+arg3: boolean: BackgroundVisible
+arg4: string: Position
+^
+|
+"topleft", "bottommiddle"
 ]]
 
 -- Create Tab
