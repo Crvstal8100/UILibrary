@@ -77,16 +77,20 @@ function Tween(instance, goal)
 end
 
 function PlaySound(parent)
-	local Sound = Instance.new("Sound")
-	Sound.Name = "UILibrarySound"
-	Sound.Parent = parent or game.Players.LocalPlayer.Character
-	Sound.SoundId = "rbxassetid://226892749"
-	Sound.Volume = 0.25
-	Sound:Play()
+	parent = parent or game.Players.LocalPlayer.Character
 
-	task.delay(Sound.TimeLength + 0.5, function()
-		Sound:Destroy()
-	end)
+	if not parent:FindFirstChild("UILibrarySound") then
+			local Sound = Instance.new("Sound")
+		Sound.Name = "UILibrarySound"
+		Sound.Parent = parent
+		Sound.SoundId = "rbxassetid://226892749"
+		Sound.Volume = 0.25
+		Sound:Play()
+
+		task.delay(Sound.TimeLength + 0.5, function()
+			Sound:Destroy()
+		end)
+	end
 end
 
 local Queue = {}
