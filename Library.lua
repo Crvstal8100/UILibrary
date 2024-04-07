@@ -544,6 +544,10 @@ function Menu:Create(title, banner, description)
 			return
 		end
 
+		if not UIMenu then
+			return
+		end
+			
 		if not UIMenu.Enabled and not Queue2[1] then
 			return	
 		end	
@@ -875,6 +879,10 @@ function Menu:Create(title, banner, description)
 				return
 			end
 
+			if not UIMenu then
+				return
+			end
+
 			if not UIMenu.Enabled and not Queue2[1] then
 				return	
 			end	
@@ -1008,6 +1016,14 @@ function Menu:Create(title, banner, description)
 				return Enum.ContextActionResult.Pass
 			end
 
+			if not UIMenu then
+				return
+			end
+
+			if not UIMenu.Enabled and not Queue2[1] then
+				return	
+			end
+
 			if selected ~= nil then
 				if items[selected] then
 					if items[selected]["Toggle"] then
@@ -1080,6 +1096,14 @@ function Menu:Create(title, banner, description)
 		game:GetService("ContextActionService"):BindActionAtPriority("UIRight", function(_, inputState, _)
 			if inputState ~= Enum.UserInputState.Begin then
 				return Enum.ContextActionResult.Pass
+			end
+
+			if not UIMenu then
+				return
+			end
+
+			if not UIMenu.Enabled and not Queue2[1] then
+				return	
 			end
 
 			if selected ~= nil then
