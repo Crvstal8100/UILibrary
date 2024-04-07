@@ -11,21 +11,6 @@ arg2: string: Banner
 arg3: string: Description
 ]]
 
--- Send Alert
-Menu:Alert("Text", function(option)
-    -- Continue = 1, Cancel = 2
-    print(option)
-end)
-
---[[
-Send Alert
-arg1: string: Text
-arg2: callback: function
-^
-|
-Continue = 1, Cancel = 2
-]]
-
 -- Send Notification
 Menu:Notify("Text", 5)
 
@@ -51,7 +36,7 @@ arg3: string: Description
 ]]
 
 -- Create Button
-tab:CreateButton("Button", function()
+Tab:CreateButton("Button", function()
 	print("Ok")
 end)
 
@@ -62,7 +47,7 @@ arg2: callback: function
 ]]
 
 -- Create Toggle
-tab:CreateToggle("Toggle", false, function(state)
+Tab:CreateToggle("Toggle", false, function(state)
 	print(state)
 end)
 
@@ -74,7 +59,7 @@ arg3: callback: function
 ]]
 
 -- Create Slider
-tab:CreateSlider("Slider", 0, 10, function(value)
+Tab:CreateSlider("Slider", 0, 10, function(value)
 	print(value)
 end)
 
@@ -87,7 +72,7 @@ arg4: callback: function
 ]]
 
 -- Create List
-tab:CreateList("List", {"1", "2", "3"}, function(value)
+Tab:CreateList("List", {"1", "2", "3"}, function(value)
 	print(value)
 end)
 
@@ -99,7 +84,7 @@ arg3: callback: function
 ]]
 
 -- Create Keybind
-tab:CreateKeybind("Keybind", "K", function()
+Tab:CreateKeybind("Keybind", "K", function()
 	print("Key Pressed")
 end)
 
@@ -111,7 +96,7 @@ arg3: callback: function
 ]]
 
 -- Create Textbox
-tab:CreateTextbox("Textbox", ". . .", function(text)
+Tab:CreateTextbox("Textbox", ". . .", function(text)
 	print(text)
 end)
 
