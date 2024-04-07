@@ -196,87 +196,9 @@ function notification(Notification)
 	end
 end
 
-function alert(Alert)
-	if Queue2[1] and not Cooldown2 and Alert then
-		Cooldown2 = true
-
-		if selected_ == nil then
-			selected_ = 1
-			Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
-			Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			Alert.Cancel.ImageColor3 = Color3.fromRGB(120, 120, 120)
-			Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-		end
-
-		PlaySound()
-
-		Alert.Visible = true
-
-		local Size = tonumber(math.floor((string.len(Queue2[1][1])) / 67))
-
-		Alert.Label.Size += UDim2.new(0, 0, 0, Size * 18)
-		Alert.Label.Text = Queue2[1][1]
-
-		Alert.BarD.Position += UDim2.new(0, 0, Size * 0.018, 0)
-
-		Alert.Continue.MouseButton1Down:Connect(function()
-			PlaySound()
-			if selected_ ~= 1 then
-				Alert.Continue.ImageColor3 = Color3.fromRGB(255, 255, 255)
-				Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-				Alert.Cancel.ImageColor3 = Color3.fromRGB(120, 120, 120)
-				Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-				selected_ = 1
-			else
-				pcall(Queue2[1][2], selected_)
-				Alert.Label.Text = ""
-				Alert.Label.Size -= UDim2.new(0, 0, 0, Size * 18)
-				Alert.BarD.Position -= UDim2.new(0, 0, Size * 0.018, 0)
-
-				Alert.Visible = false
-
-				task.delay(0.75, function()
-					table.remove(Queue2, 1)
-					Cooldown2 = false
-					selected_ = nil
-				end)
-			end
-		end)
-
-		Alert.Cancel.MouseButton1Down:Connect(function()
-			PlaySound()
-			if selected_ ~= 2 then
-				Alert.Cancel.ImageColor3 = Color3.fromRGB(255, 255, 255)
-				Alert.Cancel.TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-				Alert.Continue.ImageColor3 = Color3.fromRGB(120, 120, 120)
-				Alert.Continue.TextLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-				selected_ = 2
-			else
-				pcall(Queue2[1][2], selected_)
-				Alert.Label.Text = ""
-				Alert.Label.Size -= UDim2.new(0, 0, 0, Size * 18)
-				Alert.BarD.Position -= UDim2.new(0, 0, Size * 0.018, 0)
-
-				Alert.Visible = false
-
-				task.delay(0.75, function()
-					table.remove(Queue2, 1)
-					Cooldown2 = false
-					selected_ = nil
-				end)
-			end
-		end)
-	end
-end
-
 function Menu:Notify(String, Time, Background, Position)
 	if CheckSameString(Queue, String) ~= true then
 		table.insert(Queue, {String, Time, Background, Position})
-	end
-end
-function Menu:Alert(String, callback)
-	if CheckSameString(Queue2, String) ~= true then
-		table.insert(Queue2, {String, callback})
 	end
 end
 
@@ -303,8 +225,6 @@ function Menu:Create(title, banner, description)
 	local MenuGrid = Instance.new("UIGridLayout")
 	local Notification = Instance.new("Frame")
 	local TextLabel = Instance.new("TextLabel")
-	local Alert = Instance.new("Frame")
-	local Alert_2 = Instance.new("ImageLabel")
 	local BarU = Instance.new("Frame")
 	local Label2 = Instance.new("TextLabel")
 	local BarD = Instance.new("Frame")
@@ -322,101 +242,6 @@ function Menu:Create(title, banner, description)
 	NotificationMenu.IgnoreGuiInset = true
 	NotificationMenu.Parent = game.CoreGui
 	NotificationMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-	Alert.Name = "Alert"
-	Alert.Parent = NotificationMenu
-	Alert.Visible = false
-	Alert.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	Alert.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Alert.BorderSizePixel = 0
-	Alert.Size = UDim2.new(1, 0, 1, 0)
-
-	Alert_2.Name = "Alert"
-	Alert_2.Parent = Alert
-	Alert_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Alert_2.BackgroundTransparency = 1.000
-	Alert_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Alert_2.BorderSizePixel = 0
-	Alert_2.Position = UDim2.new(0.406382978, 0, 0.385551959, 0)
-	Alert_2.Size = UDim2.new(0, 175, 0, 41)
-	Alert_2.Image = "http://www.roblox.com/asset/?id=14326136571"
-	Alert_2.ImageColor3 = Color3.fromRGB(255, 203, 15)
-
-	BarU.Name = "BarU"
-	BarU.Parent = Alert
-	BarU.BackgroundColor3 = Color3.fromRGB(159, 159, 159)
-	BarU.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	BarU.BorderSizePixel = 0
-	BarU.Position = UDim2.new(0.207446814, 0, 0.497159094, 0)
-	BarU.Size = UDim2.new(0, 550, 0, 2)
-
-	Label2.Name = "Label"
-	Label2.Parent = Alert
-	Label2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Label2.BackgroundTransparency = 1.000
-	Label2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Label2.BorderSizePixel = 0
-	Label2.Position = UDim2.new(0.244680852, 0, 0.513392866, 0)
-	Label2.Size = UDim2.new(0, 480, 0, 36)
-	Label2.Font = Enum.Font.Nunito
-	Label2.Text = ""
-	Label2.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Label2.TextSize = 18.000
-	Label2.TextWrapped = true
-	Label2.TextYAlignment = Enum.TextYAlignment.Top
-
-	BarD.Name = "BarD"
-	BarD.Parent = Alert
-	BarD.BackgroundColor3 = Color3.fromRGB(159, 159, 159)
-	BarD.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	BarD.BorderSizePixel = 0
-	BarD.Position = UDim2.new(0.206382975, 0, 0.562, 0)
-	BarD.Size = UDim2.new(0, 550, 0, 2)
-
-	Continue.Name = "Continue"
-	Continue.Parent = Alert
-	Continue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Continue.BackgroundTransparency = 1.000
-	Continue.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Continue.BorderSizePixel = 0
-	Continue.Position = UDim2.new(0.887234032, 0, 0.935470819, 0)
-	Continue.Size = UDim2.new(0, 25, 0, 25)
-	Continue.Image = "http://www.roblox.com/asset/?id=14334835725"
-
-	TextLabel_2.Parent = Continue
-	TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel_2.BackgroundTransparency = 1.000
-	TextLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TextLabel_2.BorderSizePixel = 0
-	TextLabel_2.Position = UDim2.new(-2, 0, 0.200000003, 0)
-	TextLabel_2.Size = UDim2.new(0, 50, 0, 15)
-	TextLabel_2.Font = Enum.Font.SourceSans
-	TextLabel_2.Text = "Continue"
-	TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel_2.TextSize = 14.000
-
-	Cancel.Name = "Cancel"
-	Cancel.Parent = Alert
-	Cancel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Cancel.BackgroundTransparency = 1.000
-	Cancel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Cancel.BorderSizePixel = 0
-	Cancel.Position = UDim2.new(0.967021286, 0, 0.935470819, 0)
-	Cancel.Size = UDim2.new(0, 25, 0, 25)
-	Cancel.Image = "http://www.roblox.com/asset/?id=5612339837"
-	Cancel.ImageColor3 = Color3.fromRGB(120, 120, 120)
-
-	TextLabel_3.Parent = Cancel
-	TextLabel_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel_3.BackgroundTransparency = 1.000
-	TextLabel_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TextLabel_3.BorderSizePixel = 0
-	TextLabel_3.Position = UDim2.new(-2, 0, 0.200000003, 0)
-	TextLabel_3.Size = UDim2.new(0, 50, 0, 15)
-	TextLabel_3.Font = Enum.Font.SourceSans
-	TextLabel_3.Text = "Cancel"
-	TextLabel_3.TextColor3 = Color3.fromRGB(120, 120, 120)
-	TextLabel_3.TextSize = 14.000
 
 	Notification.Name = "Notification"
 	Notification.Parent = NotificationMenu
