@@ -544,7 +544,7 @@ function Menu:Create(title, banner, description)
 			return
 		end
 
-		if not UIMenu then
+		if UIMenu == nil then
 			return
 		end
 			
@@ -879,7 +879,7 @@ function Menu:Create(title, banner, description)
 				return
 			end
 
-			if not UIMenu then
+			if UIMenu == nil then
 				return
 			end
 
@@ -1016,7 +1016,7 @@ function Menu:Create(title, banner, description)
 				return Enum.ContextActionResult.Pass
 			end
 
-			if not UIMenu then
+			if UIMenu == nil then
 				return
 			end
 
@@ -1098,7 +1098,7 @@ function Menu:Create(title, banner, description)
 				return Enum.ContextActionResult.Pass
 			end
 
-			if not UIMenu then
+			if UIMenu == nil then
 				return
 			end
 
