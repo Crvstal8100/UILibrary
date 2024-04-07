@@ -12,7 +12,7 @@ arg3: string: Description
 ]]
 
 -- Send Notification
-Menu:Notify("Text", 5)
+Library:Notify("Text", 5, true, "bottommiddle")
 
 --[[
 Send Notification
