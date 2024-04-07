@@ -277,12 +277,12 @@ function Menu:Alert(String, callback)
 end
 
 function Menu:Create(title, banner, description)
-	if game.Players.LocalPlayer.PlayerGui:FindFirstChild(title) then
-		game.Players.LocalPlayer.PlayerGui:FindFirstChild(title):Destroy()
+	if game.CoreGui:FindFirstChild(title) then
+		game.CoreGui:FindFirstChild(title):Destroy()
 	end
 
-	if game.Players.LocalPlayer.PlayerGui:FindFirstChild(title.."_Notifications") then
-		game.Players.LocalPlayer.PlayerGui:FindFirstChild(title.."_Notifications"):Destroy()
+	if game.CoreGui:FindFirstChild(title.."_Notifications") then
+		game.CoreGui:FindFirstChild(title.."_Notifications"):Destroy()
 	end
 
 	local UIMenu = Instance.new("ScreenGui")
@@ -311,12 +311,12 @@ function Menu:Create(title, banner, description)
 
 	UIMenu.Name = title
 	UIMenu.IgnoreGuiInset = false
-	UIMenu.Parent = game.Players.LocalPlayer.PlayerGui
+	UIMenu.Parent = game.CoreGui
 	UIMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 	NotificationMenu.Name = title.."_Notifications"
 	NotificationMenu.IgnoreGuiInset = true
-	NotificationMenu.Parent = game.Players.LocalPlayer.PlayerGui
+	NotificationMenu.Parent = game.CoreGui
 	NotificationMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 	Alert.Name = "Alert"
